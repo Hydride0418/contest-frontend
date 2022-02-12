@@ -12,11 +12,11 @@
         <el-button type="primary" @click="onSubmit">查询</el-button>
         <el-button>清空</el-button>
       </el-form-item> 
-    </el-form>
-    <div type="flex" class="right_div" align="bottom">
+      </el-form>
+      <div type="flex" class="right_div" align="bottom">
       <el-button type = "primary" class="new_contest" icon="el-icon-circle-plus-outline">发起新一届赛事</el-button>
       <el-button icon="el-icon-upload2" class="new_contest">导出赛事信息</el-button>
-    </div>
+      </div>
     </el-row>
     <el-table :data="contestData" style="width: 100%">
       <el-table-column label="操作" width="400px">
@@ -32,6 +32,14 @@
       <el-table-column prop="ques_number" label="赛题数"></el-table-column>
       <el-table-column prop="archive_status" label="归档状态"></el-table-column>
     </el-table>
+    <el-pagination
+      background
+      layout="prev, pager, next"
+      page-size="6"
+      :total="50"
+      @current-change="page"
+      >
+    </el-pagination>
   </div>
 </template>
 <style>
@@ -78,30 +86,38 @@
 
 <script>
   export default {
-      data() {
-        return {
-          contestData: [{
-            contest_name:"大赛1",
-            time_limit:3,
-            ques_number:2,
-            archive_status: "已归档"
-          },{
-            contest_name:"大赛2",
-            time_limit:3,
-            ques_number:2,
-            archive_status: "已归档"
-          },{
-            contest_name:"大赛3",
-            time_limit:3,
-            ques_number:2,
-            archive_status: "未归档"
-          },{
-            contest_name:"大赛4",
-            time_limit:3,
-            ques_number:2,
-            archive_status: "已归档"
-          }]
-        }
+    methods: {
+      page(currentPage){
+        alert(currentPage);
       }
+    },
+    data() {
+      return {
+        contestData: [{
+          contest_name:"大赛1",
+          time_limit:3,
+          ques_number:2,
+          archive_status: "已归档"
+        },{
+          contest_name:"大赛2",
+          time_limit:3,
+          ques_number:2,
+          archive_status: "已归档"
+        },{
+          contest_name:"大赛3",
+          time_limit:3,
+          ques_number:2,
+          archive_status: "未归档"
+        },{
+          contest_name:"大赛4",
+          time_limit:3,
+          ques_number:2,
+          archive_status: "已归档"
+        }]
+      }
+    },
+    created() {
+      alert(1);
+    }
     }
 </script>
