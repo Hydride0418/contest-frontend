@@ -1,18 +1,15 @@
 <template>
   <div class="main_div">
     <el-row type="flex" justify="space-between">
-      <el-form label-width="80px">
-      <el-form-item label="赛事搜索" type="flex">
-        <el-row type="flex" justify="space-between">
-          <el-input placeholder="请输入赛事名称" class="contest_input"></el-input>
-          <el-radio v-model="radio" label="1" class="contest_radio">是否归档</el-radio>
-        </el-row>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
-        <el-button>清空</el-button>
-      </el-form-item> 
-      </el-form>
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+  <el-form-item label="赛事搜索" prop="name">
+    <el-input v-model="ruleForm.name"></el-input>
+  </el-form-item>
+  <el-form-item>
+    <el-button type="primary" @click="submitForm('ruleForm')">查询</el-button>
+    <el-button @click="resetForm('ruleForm')">清除</el-button>
+  </el-form-item>
+</el-form>
       <div type="flex" class="right_div" align="bottom">
       <el-button type = "primary" class="new_contest" icon="el-icon-circle-plus-outline">发起新一届赛事</el-button>
       <el-button icon="el-icon-upload2" class="new_contest">导出赛事信息</el-button>
@@ -27,7 +24,7 @@
           <el-button type="text">赛道管理</el-button>
         </template>
       </el-table-column>
-      <el-table-column prop="contest_name" label="赛事名称"></el-table-column>
+      <el-table-column prop="name" label="赛事名称"></el-table-column>
       <el-table-column prop="time_limit" label="时间限制数"></el-table-column>
       <el-table-column prop="ques_number" label="赛题数"></el-table-column>
       <el-table-column prop="archive_status" label="归档状态"></el-table-column>
@@ -89,35 +86,45 @@
     methods: {
       page(currentPage){
         alert(currentPage);
+      },
+      test(){
+        console.log(this.contestQuery);  
+      },
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            let data = {"name":this.ruleForm.name};
+            axios.post(`http://localhost:8080/contest/search`,data)
+            .then(res=>{
+                console.log('res=>',res.data); 
+                this.contestData = res.data;           
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
       }
     },
     data() {
       return {
-        contestData: [{
-          contest_name:"大赛1",
-          time_limit:3,
-          ques_number:2,
-          archive_status: "已归档"
-        },{
-          contest_name:"大赛2",
-          time_limit:3,
-          ques_number:2,
-          archive_status: "已归档"
-        },{
-          contest_name:"大赛3",
-          time_limit:3,
-          ques_number:2,
-          archive_status: "未归档"
-        },{
-          contest_name:"大赛4",
-          time_limit:3,
-          ques_number:2,
-          archive_status: "已归档"
-        }]
+        contestData: [],
+        ruleForm: {
+          name: ''
+        }
       }
     },
     created() {
-      alert(1);
-    }
+      const _this = this
+      axios.get('http://localhost:8080/contest/get').then(function(resp){
+        _this.contestData = resp.data
+      })
+    },
+    change() {
+        this.$forceUpdate();
+      }
     }
 </script>
