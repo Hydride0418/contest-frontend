@@ -1,5 +1,50 @@
 <template>
   <div class="main_div">
+    <el-dialog
+      title="发起新一届赛事"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :before-close="handleClose">
+      <el-form :model="newContest" ref="newContest" label-width="100px" class="demo-ruleForm">
+        <el-form-item
+          label="赛事名称"
+          prop="name"
+          :rules="[
+            { required: true, message: '赛事名称不能为空'}
+          ]"
+        >
+          <el-input v-model="newContest.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item
+          label="时间限制"
+          prop="time_limit"
+          :rules="[
+            { required: true, message: '时间限制不能为空'},
+            { type: 'number', message: '时间限制必须为数字值'}
+          ]"
+        >
+          <el-input v-model.number="newContest.time_limit" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item
+          label="问题数"
+          prop="question_number"
+          :rules="[
+            { required: true, message: '问题数不能为空'},
+            { type: 'number', message: '问题数必须为数字值'}
+          ]"
+        >
+          <el-input v-model.number="newContest.question_number" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="addContest('newContest')">提交</el-button>
+          <el-button @click="resetForm('ruleForm')">清除</el-button>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">关闭</el-button>
+        <!-- <el-button type="primary" @click="dialogVisible = false">确 定</el-button> -->
+      </span>
+    </el-dialog>
     <el-row type="flex" justify="space-between">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
   <el-form-item label="赛事搜索" prop="name">
@@ -11,7 +56,7 @@
   </el-form-item>
 </el-form>
       <div type="flex" class="right_div" align="bottom">
-      <el-button type = "primary" class="new_contest" icon="el-icon-circle-plus-outline">发起新一届赛事</el-button>
+      <el-button type = "primary" class="new_contest" icon="el-icon-circle-plus-outline" @click="dialogVisible = true">发起新一届赛事</el-button>
       <el-button icon="el-icon-upload2" class="new_contest">导出赛事信息</el-button>
       </div>
     </el-row>
@@ -26,7 +71,7 @@
       </el-table-column>
       <el-table-column prop="name" label="赛事名称"></el-table-column>
       <el-table-column prop="time_limit" label="时间限制数"></el-table-column>
-      <el-table-column prop="ques_number" label="赛题数"></el-table-column>
+      <el-table-column prop="question_number" label="赛题数"></el-table-column>
       <el-table-column prop="archive_status" label="归档状态"></el-table-column>
     </el-table>
     <el-pagination
@@ -105,16 +150,43 @@
           }
         });
       },
+      addContest(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            let data = {"name":this.newContest.name,"time_limit":this.newContest.time_limit,"question_number":this.newContest.question_number};
+            axios.post(`http://localhost:8080/contest/add_contest`,data)
+            .then(res=>{
+                console.log('res=>',res.data); 
+                alert('add contest success');       
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
       resetForm(formName) {
         this.$refs[formName].resetFields();
+      },handleClose(done) {
+        this.$confirm('确认关闭？')
+          .then(_ => {
+            done();
+          })
+          .catch(_ => {});
       }
     },
     data() {
       return {
+        newContest:{
+          name:'',
+          time_limit:0,
+          question_number:0
+        },
         contestData: [],
         ruleForm: {
           name: ''
-        }
+        },
+        dialogVisible: false
       }
     },
     created() {
